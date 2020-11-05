@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/useo-pl/blog-dog-shelter/issues"
   },
-  "homepage": "https://github.com/useo-pl/blog-dog-shelter#readme"
+  "homepage": "https://github.com/useo-pl/blog-dog-shelter#readme",
+  "dependencies": {
+    "next": "^10.0.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  }
 }
