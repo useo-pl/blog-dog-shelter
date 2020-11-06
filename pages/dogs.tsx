@@ -1,5 +1,7 @@
-import { gql, useQuery } from '@apollo/client';
+import { ApolloClient, gql, NormalizedCacheObject } from '@apollo/client';
+import { NextPage, NextPageContext } from 'next';
 import React from 'react';
+import withApollo from '../lib/withApollo';
 
 type Dog = {
   id: string;
@@ -19,20 +21,13 @@ const GET_DOGS = gql`
   }
 `;
 
-type DogsResponseData = {
-  dogs: Dog[];
-};
+type Props = { dogs: Dog[] };
 
-const Dogs = () => {
-  const { loading, error, data } = useQuery<DogsResponseData>(GET_DOGS);
-
-  if (loading) return 'Loading...';
-  if (error) return `Error! ${error.message}`;
-
+const Dogs: NextPage<Props> = ({ dogs }) => {
   return (
     <div>
       <h1>Dogs:</h1>
-      {data.dogs.map((dog, index) => (
+      {dogs.map((dog, index) => (
         <ul key={`dog-${index}`}>
           <li>{`name: ${dog.name}`}</li>
           <li>{`age: ${dog.age}`}</li>
@@ -43,4 +38,20 @@ const Dogs = () => {
   );
 };
 
-export default Dogs;
+type ServerSideProps = NextPageContext & { apolloClient: ApolloClient<NormalizedCacheObject> };
+
+type DogsResponse = {
+  dogs: Dog[];
+};
+
+Dogs.getInitialProps = async ({ apolloClient }: ServerSideProps) => {
+  const response = await apolloClient.query<DogsResponse>({
+    query: GET_DOGS,
+  });
+
+  return {
+    dogs: response.data.dogs,
+  };
+};
+
+export default withApollo({ ssr: true })(Dogs);
